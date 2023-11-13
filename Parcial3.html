@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: rgb(153, 152, 152);
+      color: black;
+      margin: 20px;
+    }
+
+    .input-Val {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .block {
+      width: 30px;
+      height: 30px;
+      border: 1px solid white;
+      display: flex;
+      border-radius: 6px;
+      align-items: center;
+      justify-content: center;
+      margin: 2px;
+      background-color: rgb(8, 233, 8);
+      
+    }
+
+    .selected {
+      background-color: rgb(255, 0, 0);
+      
+    }
+
+    #selectedBlocks {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    #totalSum {
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="input-Val">
+    <div style="color: white;">Cantidad de Filas</div>
+    <input type="number" id="numRows" min="1" max="50">
+    <button onclick="dibujarPiramide()">Dibujar Pirámide</button>
+  </div>
+  <div id="pyramid"></div>
+  <div id="selectedBlocks"></div>
+  <div id="totalSum"></div>
+
+  <script>
+    function dibujarPiramide() {
+      var numRows = parseInt(document.getElementById('numRows').value);
+      var pyramid = document.getElementById('pyramid');
+      var selectedBlocksDiv = document.getElementById('selectedBlocks');
+      var totalSumDiv = document.getElementById('totalSum');
+
+      pyramid.innerHTML = '';
+      selectedBlocksDiv.innerHTML = '';
+      totalSumDiv.innerHTML = '';
+
+      var pyramidArray = [];
+
+      for (var i = 1; i <= numRows; i++) {
+        var bloque = [];
+        for (var j = 0; j < i; j++) {
+          var randomNum = getRandomNumber(1, 99);
+          bloque.push(randomNum);
+        }
+        pyramidArray.push(bloque);
+      }
+
+      var currentIndex = 0;
+      var sum = pyramidArray[0][0];
+      var selectedBlocks = [{ value: pyramidArray[0][0], row: 0, index: 0 }];
+      
+      for (var i = 1; i < numRows; i++) {
+        var leftAdjacent = pyramidArray[i][currentIndex];
+        var rightAdjacent = pyramidArray[i][currentIndex + 1];
+
+        // Seleccionar el número más grande
+        if (leftAdjacent > rightAdjacent) {
+          currentIndex = currentIndex;
+        } else {
+          currentIndex = currentIndex + 1;
+        }
+
+        sum += pyramidArray[i][currentIndex];
+        selectedBlocks.push({ value: pyramidArray[i][currentIndex], row: i, index: currentIndex });
+      }
+
+      displayPyramid(pyramidArray);
+      displaySelectedBlocks(selectedBlocksDiv, selectedBlocks);
+      displayTotalSum(totalSumDiv, sum);
+    }
+
+    function getRandomNumber(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function displayPyramid(pyramidArray) {
+      var pyramidDiv = document.getElementById('pyramid');
+
+      for (var i = 0; i < pyramidArray.length; i++) {
+        var rowDiv = document.createElement('div');
+        rowDiv.className = 'row';
+        for (var j = 0; j < pyramidArray[i].length; j++) {
+          var blockDiv = document.createElement('div');
+          blockDiv.className = 'block';
+          blockDiv.textContent = pyramidArray[i][j];
+          rowDiv.appendChild(blockDiv);
+        }
+        pyramidDiv.appendChild(rowDiv);
+      }
+    }
+
+    function displaySelectedBlocks(selectedBlocksDiv, selectedBlocks) {
+      var pyramidBlocks = document.querySelectorAll('.block');
+      
+      selectedBlocks.forEach(function (block) {
+        var blockIndex = block.row * (block.row + 1) / 2 + block.index;
+        pyramidBlocks[blockIndex].classList.add('selected');
+      });
+
+      selectedBlocksDiv.innerHTML = 'Cuadros seleccionados para la suma: ' + selectedBlocks.map(function (block) {
+        return block.value;
+      }).join(', ');
+    }
+
+    function displayTotalSum(totalSumDiv, sum) {
+      totalSumDiv.innerHTML = 'La suma total es: ' + sum;
+    }
+  </script>
+</body>
+
+</html>
